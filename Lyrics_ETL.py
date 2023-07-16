@@ -1,7 +1,8 @@
+import pandas as pd
 import json
 import re
 import os
-from helper_functions import create_connection, execute_query, execute_read_query
+from helper_functions import create_connection, execute_query, execute_read_query, clean_lyrics
 
 # The data folder contains the downloaded JSON files for every album. For each file, this will extract the lyrics for each track,
 # do some preliminary cleaning, and save it into the database.
@@ -16,7 +17,7 @@ CREATE TABLE IF NOT EXISTS lyrics (
     song_title TEXT NOT NULL,
     artist TEXT NOT NULL,
     album TEXT NOT NULL,
-    release_year INTEGER
+    release_year INTEGER,
     song_lyrics TEXT NOT NULL
 );
 '''
@@ -39,23 +40,38 @@ for filename in os.listdir(directory):
         for track in album['tracks']:
             song_title = track['song']['title']
             lyrics = track['song']['lyrics']
-            # Remove first line (song title and contributors), song structure labels, and ending tag.
-            first_line = r'^.*?\n'
-            lyrics = re.sub(first_line, '', lyrics, count=1)
-
-            structure_labels = r'\[.*?\]'
-            lyrics = re.sub(structure_labels, '', lyrics)
             
-            embed_tag = r'\d*Embed'
-            lyrics = re.sub(embed_tag, '', lyrics)
+            # Remove first line (song title and contributors), song structure labels, and ending tag.
+            lyrics = clean_lyrics(lyrics)
             
             # Load track info and lyrics into database.
             insert_track = f'''
             INSERT INTO
                 lyrics (song_title, artist, album, release_year, song_lyrics)
             VALUES
-                ({song_title}, {artist}, {album_title}, {year}, {lyrics});
+                ('{song_title}', '{artist}', '{album_title}', '{year}', '{lyrics}');
             '''
             execute_query(connection, insert_track)
 
 # Create Artist Table
+# Import album_list table and reduce to just single entry for each artist.
+artist_df = pd.read_excel('album_list.xlsx')
+artist_df.drop(columns='Album', inplace=True)
+artist_df.drop_duplicates(inplace=True)
+
+# Create table in database
+create_artist_table = '''
+CREATE TABLE IF NOT EXISTS artists (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    artist TEXT NOT NULL,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL,
+    region TEXT NOT NULL
+);
+'''
+execute_query(connection, create_lyrics_table)
+
+# Insert artist df into database table.
+artist_df.to_sql('artists', connection, if_exists='replace', index=False)
+connection.commit()
+connection.close()
