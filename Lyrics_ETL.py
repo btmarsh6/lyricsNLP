@@ -11,7 +11,7 @@ from helper_functions import create_connection, execute_query, execute_read_quer
 connection = create_connection('lyrics_nlp.sqlite')
 
 # Create table for song lyrics
-create_lyrics_table = '''
+create_lyrics_table = """
 CREATE TABLE IF NOT EXISTS lyrics (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     song_title TEXT NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS lyrics (
     release_year INTEGER,
     song_lyrics TEXT NOT NULL
 );
-'''
+"""
 execute_query(connection, create_lyrics_table)
 
 # Extract data from JSON files
@@ -41,17 +41,19 @@ for filename in os.listdir(directory):
             song_title = track['song']['title']
             lyrics = track['song']['lyrics']
             
-            # Remove first line (song title and contributors), song structure labels, and ending tag.
-            lyrics = clean_lyrics(lyrics)
-            
-            # Load track info and lyrics into database.
-            insert_track = f'''
-            INSERT INTO
-                lyrics (song_title, artist, album, release_year, song_lyrics)
-            VALUES
-                ('{song_title}', '{artist}', '{album_title}', '{year}', '{lyrics}');
-            '''
-            execute_query(connection, insert_track)
+            # Some albums do not have lyrics for all tracks. Skip over these ones.
+            if lyrics != "":
+                # Remove first line (song title and contributors), song structure labels, and ending tag.
+                lyrics = clean_lyrics(lyrics)
+                
+                # Load track info and lyrics into database.
+                insert_track = f"""
+                INSERT INTO
+                    lyrics (song_title, artist, album, release_year, song_lyrics)
+                VALUES
+                    ("{song_title}", "{artist}", "{album_title}", "{year}", "{lyrics}");
+                """
+                execute_query(connection, insert_track)
 
 # Create Artist Table
 # Import album_list table and reduce to just single entry for each artist.
@@ -60,7 +62,7 @@ artist_df.drop(columns='Album', inplace=True)
 artist_df.drop_duplicates(inplace=True)
 
 # Create table in database
-create_artist_table = '''
+create_artist_table = """
 CREATE TABLE IF NOT EXISTS artists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     artist TEXT NOT NULL,
@@ -68,7 +70,7 @@ CREATE TABLE IF NOT EXISTS artists (
     state TEXT NOT NULL,
     region TEXT NOT NULL
 );
-'''
+"""
 execute_query(connection, create_lyrics_table)
 
 # Insert artist df into database table.
