@@ -25,7 +25,7 @@ def clean_lyrics(lyrics):
     embed_tag = r'\d*Embed'
 
     # Remove 'You might also like'
-    recommender = r'You might also like$'
+    recommender = r'You might also like'
     
 
     expressions = [first_line, square_bracket_labels, curly_bracket_labels, repeats, embed_tag, recommender]
@@ -33,7 +33,7 @@ def clean_lyrics(lyrics):
         lyrics = re.sub(expression, '', lyrics)
     
     # Strip punctuation 
-    lyrics = remove_punc(lyrics)
+    # lyrics = remove_punc(lyrics)
     return lyrics
 
 
@@ -58,6 +58,14 @@ def execute_query(connection, query):
     except Error as e:
         print(f'The error {e} occurred.')
 
+def execute_insert_values_query(connection, query, values):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query, values)
+        connection.commit()
+        print('Query executed successfully!')
+    except Error as e:
+        print(f'The error {e} occurred.')
 
 def execute_read_query(connection, query):
     cursor = connection.cursor()

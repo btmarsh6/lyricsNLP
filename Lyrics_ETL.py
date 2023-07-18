@@ -2,7 +2,7 @@ import pandas as pd
 import json
 import re
 import os
-from helper_functions import create_connection, execute_query, execute_read_query, clean_lyrics
+from helper_functions import create_connection, execute_query, execute_insert_values_query, clean_lyrics
 
 # The data folder contains the downloaded JSON files for every album. For each file, this will extract the lyrics for each track,
 # do some preliminary cleaning, and save it into the database.
@@ -31,6 +31,7 @@ for filename in os.listdir(directory):
         # Open JSON file and extract album information
         album = json.load(open(f))
         artist = album['artist']['name']
+
         album_title = album['name']
         year = album['release_date_components']['year']
         # **VALIDATION**
@@ -47,13 +48,16 @@ for filename in os.listdir(directory):
                 lyrics = clean_lyrics(lyrics)
                 
                 # Load track info and lyrics into database.
-                insert_track = f"""
+                insert_track = """
                 INSERT INTO
                     lyrics (song_title, artist, album, release_year, song_lyrics)
-                VALUES
-                    ("{song_title}", "{artist}", "{album_title}", "{year}", "{lyrics}");
+                VALUES (?, ?, ?, ?, ?);
                 """
-                execute_query(connection, insert_track)
+                # FIX THIS PART!!!!
+                values = (song_title, artist, album_title, year, lyrics)
+
+                execute_insert_values_query(connection, insert_track, values)
+                print(album_title) # to help find errors
 
 # Create Artist Table
 # Import album_list table and reduce to just single entry for each artist.
