@@ -9,8 +9,9 @@ import gensim.corpora as corpora
 from gensim.models import CoherenceModel
 import pyLDAvis.gensim
 import matplotlib.pyplot as plt
-%matplotlib inline
+
 from helper_functions import create_connection, sent_to_words, remove_stopwords, lemmatization
+from pprint import pprint
 
 # Load data
 connection = create_connection('lyrics_nlp.sqlite')
@@ -23,6 +24,35 @@ data = df.song_lyrics.values.tolist()
 # Tokenize each song into list of individual words
 data_words = list(sent_to_words(data))
 # Remove stop words
-words_no_stop = remove_stopwords(data_words)
+data_no_stop = remove_stopwords(data_words)
 # Lemmatize words
-words_lemmatized = lemmatization(words_no_stop)
+data_lemmatized = lemmatization(data_no_stop)
+
+# Build LDA Model
+
+# start with creating a dictionary
+id2word = corpora.Dictionary(data_lemmatized)
+
+# create corpus
+texts = data_lemmatized
+
+# term document frequency
+corpus = [id2word.doc2bow(text) for text in texts]
+
+# Baseline model
+baseline = gensim.models.ldamodel.LdaModel(corpus=corpus,
+                                          id2word=id2word,
+                                          num_topics=10,
+                                          random_state=100,
+                                          chunksize=200,
+                                          passes=10,
+                                          per_word_topics=True)
+
+pprint(baseline.print_topics())
+
+doc_lda = baseline[corpus]
+
+# How good a given model is shown through topic coherence
+coherence_model_lda = CoherenceModel(model=baseline, texts=data_lemmatized, dictionary=id2word, coherence='c_v')
+coherence_lda = coherence_model_lda.get_coherence()
+print('\nCoherenceScore: ', coherence_lda)
