@@ -2,7 +2,7 @@ import pandas as pd
 import json
 import re
 import os
-from helper_functions import create_connection, execute_query, execute_insert_values_query, clean_lyrics
+from helper_functions import create_connection, execute_query, execute_insert_values_query, execute_read_query, clean_lyrics
 
 # The data folder contains the downloaded JSON files for every album. For each file, this will extract the lyrics for each track,
 # do some preliminary cleaning, and save it into the database.
@@ -66,7 +66,7 @@ artist_df.drop(columns='Album', inplace=True)
 artist_df.drop_duplicates(inplace=True)
 
 # Create table in database
-create_artist_table = """
+create_artists_table = """
 CREATE TABLE IF NOT EXISTS artists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     artist TEXT NOT NULL,
@@ -75,9 +75,21 @@ CREATE TABLE IF NOT EXISTS artists (
     region TEXT NOT NULL
 );
 """
-execute_query(connection, create_lyrics_table)
+execute_query(connection, create_artists_table)
 
 # Insert artist df into database table.
 artist_df.to_sql('artists', connection, if_exists='replace', index=False)
 connection.commit()
 connection.close()
+
+# Report Database details
+song_count_query = '''
+    SELECT COUNT(*) FROM lyrics;
+    '''
+song_count = execute_read_query(connection, song_count_query)
+
+artist_count_query = '''
+    SELECT COUNT(*) FROM artists;
+    '''
+artist_count = execute_read_query(connection, artist_count_query)
+print(f'Database contains lyrics to {song_count[0][0]} songs from {artist_count[0][0]} artists.')

@@ -1,11 +1,9 @@
 import re
 import sqlite3
 from sqlite3 import Error
-import string
-
-def remove_punc(text):
-    text_list = [char for char in text if not char in string.punctuation]
-    return ''.join(text_list)
+from gensim.utils import simple_preprocess
+import spacy
+from nltk.corpus import stopwords
 
 def clean_lyrics(lyrics):
     """ (str) -> str
@@ -32,14 +30,14 @@ def clean_lyrics(lyrics):
     for expression in expressions:
         lyrics = re.sub(expression, '', lyrics)
     
-    # Strip punctuation 
-    # lyrics = remove_punc(lyrics)
     return lyrics
 
 
 # Functions to help execute SQL commands
 
 def create_connection(path):
+    """ (str) -> Connection obj
+    """
     connection = None
     try:
         connection = sqlite3.connect(path)
@@ -77,3 +75,28 @@ def execute_read_query(connection, query):
     except Error as e:
         print(f'The error {e} occurred.')
 
+# LDA Model Building Functions
+
+# Preprocessing
+
+def sent_to_words(songs):
+    """ (list of str) -> generator object
+    Takes list of song lyrics, tokenizes words and cleans up text using Gensim's preprocess
+    """
+    for song in songs:
+        yield(simple_preprocess(str(song), deacc=True))
+
+def remove_stopwords(data_words):
+    """ (list of list of str) -> list of list of str
+    """
+    stop_words = stopwords.words('english')
+    return[[word for word in song if word not in stop_words] for song in data_words]
+
+
+def lemmatization(texts, allowed_postags=['NOUN', 'VERB', 'PROPN']):
+    nlp = spacy.load("en_core_web_sm")
+    texts_out= []
+    for song in texts:
+        doc = nlp(' '.join(song))
+        texts_out.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
+    return texts_out
