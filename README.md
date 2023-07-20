@@ -11,7 +11,7 @@ I then used the lyricsgenius API to download a JSON of each album containing the
 Once I had the lyrics, I did some pre-processing to get them ready to feed into the LDA Model.
 
 ## Current Status
-Working on cleaning the lyrics from the JSON files to remove things like song structure indicators (Chorus, verse, repeat x2, etc.) and info from the source website that was scraped with the song lyrics (number of contributors, text from links, etc.)
+Working on preprocessing data to prepare it for LDA topic modeling.
 
 ## Challenges and Future Work
 This project is currently based primarily on studio albums and occasionally some mixtapes. In the age of music streaming, many artists are now focusing less on putting out full albums and instead just releasing one off songs as singles. These songs are not included in the data unless they also appear on an album.
