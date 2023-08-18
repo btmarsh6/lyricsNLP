@@ -19,6 +19,7 @@ query = 'SELECT * FROM lyrics'
 df = pd.read_sql(query, connection, index_col='id')
 
 # Pre-processing
+print("Preparing lyrics data...")
 data = df.song_lyrics.values.tolist()
 
 # Tokenize each song into list of individual words
@@ -40,6 +41,7 @@ texts = data_lemmatized
 corpus = [id2word.doc2bow(text) for text in texts]
 
 # Baseline model
+print("Training Model...")
 baseline = gensim.models.ldamodel.LdaModel(corpus=corpus,
                                           id2word=id2word,
                                           num_topics=10,
@@ -49,6 +51,8 @@ baseline = gensim.models.ldamodel.LdaModel(corpus=corpus,
                                           per_word_topics=True)
 
 pprint(baseline.print_topics())
+
+# some error is occuring here
 
 doc_lda = baseline[corpus]
 
