@@ -80,7 +80,7 @@ execute_query(connection, create_artists_table)
 # Insert artist df into database table.
 artist_df.to_sql('artists', connection, if_exists='replace', index=False)
 connection.commit()
-connection.close()
+
 
 # Report Database details
 song_count_query = '''
