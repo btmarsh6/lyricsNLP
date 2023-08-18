@@ -53,11 +53,10 @@ for filename in os.listdir(directory):
                     lyrics (song_title, artist, album, release_year, song_lyrics)
                 VALUES (?, ?, ?, ?, ?);
                 """
-                # FIX THIS PART!!!!
                 values = (song_title, artist, album_title, year, lyrics)
 
                 execute_insert_values_query(connection, insert_track, values)
-                print(album_title) # to help find errors
+                # print(album_title) # to help find errors
 
 # Create Artist Table
 # Import album_list table and reduce to just single entry for each artist.
