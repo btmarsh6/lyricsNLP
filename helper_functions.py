@@ -86,11 +86,21 @@ def sent_to_words(songs):
     for song in songs:
         yield(simple_preprocess(str(song), deacc=True))
 
-def remove_stopwords(data_words):
-    """ (list of list of str) -> list of list of str
+
+def remove_stopwords(song):
+    """ (str) -> str
     """
+    # create stopword list
     stop_words = stopwords.words('english')
-    return[[word for word in song if word not in stop_words] for song in data_words]
+    additional_stopwords = ['get', 'got', 'gonna', 'gon', 'feat', 'ft','featuring', 'uh', 'uhh', 'uh-huh', 'huh', "'bout", 'oh', "goin'", "doin'", 'gotta', 'da', 'em', 'like', 'yeah']
+    for word in additional_stopwords:
+        stop_words.append(word)
+
+    # lowercase, tokenize and deaccent
+    word_list = simple_preprocess(song)
+    
+    return ' '.join([lyric for lyric in word_list if lyric not in stop_words])
+
 
 
 def lemmatization(texts, allowed_postags=['NOUN', 'VERB', 'PROPN']):

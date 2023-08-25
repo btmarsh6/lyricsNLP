@@ -1,13 +1,23 @@
-from bertopic import BERTopic
+# Data processing
 import pandas as pd
 import numpy as np
+
+# text processing
 import nltk
 nltk.download('stopwords')
 nltk.download('omw-1.4')
 nltk.download('wordnet')
 wn = nltk.WordNetLemmatizer()
+
+# dimension reduction
 from umap import UMAP
-from helper_functions import create_connection
+
+# modeling
+from bertopic import BERTopic
+
+# Helper functions
+from helper_functions import create_connection, remove_stopwords
+
 
 # Import data
 connection = create_connection('lyrics_nlp.sqlite')
@@ -18,11 +28,11 @@ df = pd.read_sql(query, connection, index_col='id')
 # Text preprocessing
 
 # Remove stopwords
-stopwords = nltk.corpus.stopwords.words('english')
-df['lyrics_no_stopwords'] = df['song_lyrics'].apply(lambda x: ' '.join([w for w in x.split() if w.lower() not in stopwords]))
+df['lyrics_no_stopwords'] = df['song_lyrics'].apply(remove_stopwords)
+
 
 # Lemmatize
-df['lyrics_lemmatized'] = df['lyrics_no_stopwords'].apply(lambda x: ' '.join([wn.lemmatize(w) for w in x.split() if w not in stopwords]))
+df['lyrics_lemmatized'] = df['lyrics_no_stop'].apply(lambda x: ' '.join([wn.lemmatize(w) for w in x.split()]))
 
 
 # Model Building
@@ -41,3 +51,5 @@ topic_model = BERTopic(umap_model=umap_model,
 
 topics, probabilities = topic_model.fit_transform(df['lyrics_lemmatized'])
 
+# extract topics
+topic_model.get_topic_info()
