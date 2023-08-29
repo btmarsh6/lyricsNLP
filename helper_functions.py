@@ -110,3 +110,19 @@ def lemmatization(texts, allowed_postags=['NOUN', 'VERB', 'PROPN']):
         doc = nlp(' '.join(song))
         texts_out.append([token.lemma_ for token in doc if token.pos_ in allowed_postags])
     return texts_out
+
+
+def chunk_song(song, chunk_size):
+    """ (str, int) --> list of str
+    Splits the full text of the song into chunks of lines. Number of lines per chunk determined by chunk_size
+    """
+    new_line = r'.+'
+    song_split = re.findall(new_line, song)
+
+    chunk = []
+    for i in range(0, len(song_split), chunk_size):
+        current_set = song_split[i:i+chunk_size]
+        concatenated_set = " ".join(current_set)
+        chunk.append(concatenated_set)
+    
+    return chunk
