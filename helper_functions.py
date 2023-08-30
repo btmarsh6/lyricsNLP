@@ -25,8 +25,11 @@ def clean_lyrics(lyrics):
     # Remove 'You might also like'
     recommender = r'You might also like'
     
+    # Remove ticket ad
+    ticket_tag = r'See \S+ \S* LiveGet tickets as low as \$\d+'
 
-    expressions = [first_line, square_bracket_labels, curly_bracket_labels, repeats, embed_tag, recommender]
+
+    expressions = [first_line, square_bracket_labels, curly_bracket_labels, repeats, embed_tag, recommender, ticket_tag]
     for expression in expressions:
         lyrics = re.sub(expression, '', lyrics)
     

@@ -1,6 +1,5 @@
 import pandas as pd
 import json
-import re
 import os
 from helper_functions import create_connection, execute_query, execute_insert_values_query, execute_read_query, clean_lyrics
 
@@ -57,7 +56,8 @@ for filename in os.listdir(directory):
 
                 execute_insert_values_query(connection, insert_track, values)
                 # print(album_title) # to help find errors
-
+print('Lyrics Table Complete.')
+print('Creating Artists Table...')
 # Create Artist Table
 # Import album_list table and reduce to just single entry for each artist.
 artist_df = pd.read_excel('album_list.xlsx')
