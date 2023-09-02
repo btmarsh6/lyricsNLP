@@ -35,10 +35,6 @@ def clean_lyrics(lyrics):
     
     return lyrics
 
-def remove_non_songs(db):
-    """
-    Remove rows from data base that are track lists or other non-songs.
-    """
 
 # Functions to help execute SQL commands
 
@@ -133,3 +129,19 @@ def chunk_song(song, chunk_size):
         chunk.append(concatenated_set)
     
     return chunk
+
+def remove_non_songs(df):
+    """
+    Remove rows from dataframe that are track lists or other non-songs.
+    """
+    # Filters
+    tracklist_filter = df['song_title'].str.contains('Tracklist')
+    album_art_filter = df['song_title'].str.contains('Album Art')
+    cover_art_filter = df['song_title'].str.contains('Cover Art')
+
+    # Indices of filtered rows
+    non_songs_index = df[tracklist_filter|album_art_filter|cover_art_filter].index.tolist()
+
+    clean_df = df.drop(index=non_songs_index)
+    
+    return clean_df
