@@ -41,8 +41,8 @@ for filename in os.listdir(directory):
             song_title = track['song']['title']
             lyrics = track['song']['lyrics']
             
-            # Some albums do not have lyrics for all tracks. Skip over these ones.
-            if lyrics != "":
+            # Some albums do not have lyrics for all tracks. Some tracks are short skits. Skip over these ones.
+            if len(lyrics) > 100:
                 # Remove first line (song title and contributors), song structure labels, and ending tag.
                 lyrics = clean_lyrics(lyrics)
                 

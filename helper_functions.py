@@ -26,7 +26,7 @@ def clean_lyrics(lyrics):
     recommender = r'You might also like'
     
     # Remove ticket ad
-    ticket_tag = r'See \S+ \S* LiveGet tickets as low as \$\d+'
+    ticket_tag = r'See .*? LiveGet tickets as low as \$\d*'
 
 
     expressions = [first_line, square_bracket_labels, curly_bracket_labels, repeats, embed_tag, recommender, ticket_tag]
@@ -35,6 +35,10 @@ def clean_lyrics(lyrics):
     
     return lyrics
 
+def remove_non_songs(db):
+    """
+    Remove rows from data base that are track lists or other non-songs.
+    """
 
 # Functions to help execute SQL commands
 
