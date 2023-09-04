@@ -16,7 +16,7 @@ from umap import UMAP
 from bertopic import BERTopic
 
 # Helper functions
-from helper_functions import create_connection, remove_stopwords
+from helper_functions import create_connection, remove_stopwords, remove_non_songs
 
 
 # Import data
@@ -26,17 +26,20 @@ df = pd.read_sql(query, connection, index_col='id')
 
 
 # Text preprocessing
+print('Preparing documents...')
+# Remove non-song tracks
+df = remove_non_songs(df)
 
 # Remove stopwords
 df['lyrics_no_stopwords'] = df['song_lyrics'].apply(remove_stopwords)
 
 
 # Lemmatize
-df['lyrics_lemmatized'] = df['lyrics_no_stop'].apply(lambda x: ' '.join([wn.lemmatize(w) for w in x.split()]))
+df['lyrics_lemmatized'] = df['lyrics_no_stopwords'].apply(lambda x: ' '.join([wn.lemmatize(w) for w in x.split()]))
 
 
 # Model Building
-
+print('Building model...')
 # Initiate UMAP
 umap_model = UMAP(n_neighbors=15,
                   n_components=5,
@@ -52,4 +55,5 @@ topic_model = BERTopic(umap_model=umap_model,
 topics, probabilities = topic_model.fit_transform(df['lyrics_lemmatized'])
 
 # extract topics
-topic_model.get_topic_info()
+
+print(topic_model.get_topic_info())
