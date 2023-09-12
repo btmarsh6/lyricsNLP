@@ -12,6 +12,7 @@ I used BERTopic to perform the topic modeling. Initially, I passed the full stri
 
 ## Current Status
 Working on improving the clusters formed by the model running on smaller song chunks and adjusting BERTopic hyperparameters.
+Most songs are being clustered into one topic group. Currently, I am exploring this group and the 3 other small clusters to understand better why the clustering is happening like this. Also exploring finetuning Sentence Transformer on this dataset.
 
 ## Challenges and Future Work
 This project is currently based primarily on studio albums and occasionally some mixtapes. In the age of music streaming, many artists are now focusing less on putting out full albums and instead just releasing one off songs as singles. These songs are not included in the data unless they also appear on an album. Additionally, my methodology does not account for features and collaborations. All words from a song are attributed to the artist on whose album the song appears.
